@@ -21,6 +21,7 @@ function init() {
  * @returns {Array<Object>} An array of recipes found in localStorage
  */
 function getRecipesFromStorage() {
+	return JSON.parse(localStorage.getItem("recipes"));
 	// A9. TODO - Complete the functionality as described in this function
 	//           header. It is possible in only a single line, but should
 	//           be no more than a few lines.
@@ -34,6 +35,15 @@ function getRecipesFromStorage() {
  * @param {Array<Object>} recipes An array of recipes
  */
 function addRecipesToDocument(recipes) {
+	const container = document.querySelector("main");
+
+	for (let recipe of recipes) {
+		const recipeCard = document.createElement("recipe-card");
+		recipeCard.data = recipe;
+
+		container.append(recipeCard);
+	}
+
 	// A10. TODO - Get a reference to the <main> element
 	// A11. TODO - Loop through each of the recipes in the passed in array,
 	//            create a <recipe-card> element for each one, and populate
@@ -51,6 +61,7 @@ function saveRecipesToStorage(recipes) {
 	// B1. TODO - Complete the functionality as described in this function
 	//            header. It is possible in only a single line, but should
 	//            be no more than a few lines.
+	localStorage.setItem("recipes", JSON.stringify(recipes));
 }
 
 /**
@@ -58,6 +69,37 @@ function saveRecipesToStorage(recipes) {
  * <button>.
  */
 function initFormHandler() {
+	const container = document.querySelector("main");
+
+	const form = document.querySelector("form");
+
+	form.addEventListener("submit", e => {
+		e.preventDefault();
+
+		const data = new FormData(form);
+		const recipeObject = {};
+
+		for (const [key, value] of data) {
+			recipeObject[key] = value;
+		}
+
+		const recipeCard = document.createElement("recipe-card");
+		recipeCard.data = recipeObject;
+
+		container.append(recipeCard);
+
+		let recipes = getRecipesFromStorage();
+		recipes.push(recipeObject);
+
+		saveRecipesToStorage(recipes);
+	});
+
+	const clear = document.querySelector("#new-recipe > button.danger");
+	clear.addEventListener("click", e => {
+		saveRecipesToStorage([]);
+		container.innerHTML = "";
+	});
+
 	// B2. TODO - Get a reference to the <form> element
 	// B3. TODO - Add an event listener for the 'submit' event, which fires when the
 	//            submit button is clicked
